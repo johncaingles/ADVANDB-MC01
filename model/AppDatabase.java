@@ -7,28 +7,49 @@ import utilities.dbconnection.MySQLConnector;
 
 public class AppDatabase {
 	
-	private HashMap<String, ArrayList<String>> mapOfQueries;
+	private HashMap<String, HashMap<String, String>> queryStatements;
+	private HashMap<String, String> queryInfos;
 	
 	public AppDatabase(){
-		mapOfQueries = new HashMap<String, ArrayList<String>>();
-		initializeMapOfQueriesList();
+		queryStatements = new HashMap<String, HashMap<String, String>>();
+		queryInfos = new HashMap<String, String>();
+		initializeQueryOptimizations();
+		intializeQueryInfos();
 	}
 	
-	private void initializeMapOfQueriesList() {
-		ArrayList<String> tempList;
+
+	private void initializeQueryOptimizations() {
+		HashMap<String, String> queryStatementsBasedOnOptimization;
+		String queryType;
+		String optimizationType;
+		String statement;
 		/** Custom */
-		tempList = new ArrayList<>();
-		mapOfQueries.put("Custom", tempList);
+		queryType = "Custom";
+		/** Start of Optimization List */
+		optimizationType = "";
+		statement = "";
+		queryStatementsBasedOnOptimization = new HashMap<>();
+		queryStatementsBasedOnOptimization.put(optimizationType, statement);
+		/** Final initialization */
+		queryStatements.put(queryType, queryStatementsBasedOnOptimization);
 		
 		/** Query 1 */
-		tempList = new ArrayList<>();
-		tempList.add("Database thingy");
-		tempList.add("More Optimization");
-		mapOfQueries.put("Query 1", tempList);
+		queryType = "Query 1";
+		/** Start of Optimization List */
+		optimizationType = "";
+		statement = "";
+		queryStatementsBasedOnOptimization = new HashMap<>();
+		queryStatementsBasedOnOptimization.put(optimizationType, statement);
+		/** Final initialization */
+		queryStatements.put(queryType, queryStatementsBasedOnOptimization);
+	}
+
+	private void intializeQueryInfos() {
+		
 	}
 	
-	public HashMap<String, ArrayList<String>> getMapOfQueries(){
-		return mapOfQueries;
+	public HashMap<String, HashMap<String, String>> getMapOfQueries(){
+		return queryStatements;
 	}
 		
 }

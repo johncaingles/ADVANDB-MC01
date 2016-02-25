@@ -16,7 +16,7 @@ public class TableViewController {
 
 	private TableView view;
 	private MySQLConnector connector;
-	private HashMap<String, ArrayList<String>> queries;
+	private HashMap<String, HashMap<String, String>> queries;
 	private AppDatabase appDatabase;
 	
 	public TableViewController(TableView view) {
@@ -35,7 +35,6 @@ public class TableViewController {
 
 	public void submitQuery(String queryType, String optimizationType) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	public void submitCustomStatement(String query) {
@@ -56,8 +55,12 @@ public class TableViewController {
 	}
 
 	public void updateOptimizationList(String queryType) {
-		/** Get values(query list) */
-		ArrayList<String> optimizationList = queries.get(queryType);
+		/** Get value then keys(optimization list) */
+		HashMap<String, String> optimizationMap = queries.get(queryType);
+		ArrayList<String> optimizationList = new ArrayList<>();
+		for ( String key : optimizationMap.keySet() ) {
+			optimizationList.add(key);
+		}
 		/** Set model for queries */
 		DefaultComboBoxModel queryModel = new DefaultComboBoxModel( optimizationList.toArray() );
 		view.setOptimizationListModel(queryModel);	
