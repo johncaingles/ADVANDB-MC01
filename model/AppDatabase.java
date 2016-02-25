@@ -29,7 +29,6 @@ public class AppDatabase {
 	
 	public HashMap<String, ArrayList<String>> getMapOfQueries(){
 		return mapOfQueries;
-		
 	}
 		
 }

@@ -141,6 +141,7 @@ public class TableView extends JPanel implements ActionListener, KeyListener
 			String queryType = getInputQueryType();
 			String optimizationType = getChosenOptimizationType();
 			controller.submitQuery(queryType, optimizationType);
+			txtarQuery.setEditable(false);
 			// TODO Render Table
 			
 		} else
