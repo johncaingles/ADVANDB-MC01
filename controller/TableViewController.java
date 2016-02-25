@@ -23,10 +23,10 @@ public class TableViewController {
 		this.view = view;
 		this.connector = new MySQLConnector(
 				"jdbc:mysql://localhost:3306/", 
-				"databasename", 
+				"db_hpq", 
 				"com.mysql.jdbc.Driver", 
-				"userName", 
-				"pass");
+				"root", 
+				"p@ssword");
 		connector.getConnection();
 		this.appDatabase = new AppDatabase();
 		/** Initialize list of queries */
@@ -41,6 +41,7 @@ public class TableViewController {
 		ResultSet resultSet = connector.executeQuery(query);
 		TableModel model = DbUtils.resultSetToTableModel(resultSet);
 		view.getResultTable().setModel(model);
+		view.getTxtTime().setText(Long.toString(connector.getExeTime())+ " ms");
 	}
 
 	public void initializeViewData() {

@@ -15,6 +15,7 @@ public class MySQLConnector {
     private static String driver;
     private static String userName;
     private static String pass;
+    private static long exeTime; 
 	
     public MySQLConnector(String url, String dbName, String driver, String userName, String pass){
         this.url = url;             //"jdbc:mysql://localhost:3306/"; 
@@ -53,11 +54,19 @@ public class MySQLConnector {
             ResultSet result = null;
             Connection conn = MySQLConnector.getConnection();
         try {
+        	long start = System.currentTimeMillis();
             Statement st = conn.createStatement();
             result = st.executeQuery(query);
+            exeTime = System.currentTimeMillis() - start;
+            System.out.println(exeTime);
         } catch (SQLException ex) {
             Logger.getLogger(MySQLConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
+    }
+    
+    public long getExeTime()
+    {
+    	return this.exeTime;
     }
 }

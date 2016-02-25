@@ -29,6 +29,7 @@ import java.awt.Panel;
 import javax.swing.JLabel;
 import javax.swing.JComboBox;
 import javax.swing.JTextPane;
+import javax.swing.ScrollPaneConstants;
 
 public class TableView extends JPanel implements ActionListener, KeyListener  
 {
@@ -72,16 +73,18 @@ public class TableView extends JPanel implements ActionListener, KeyListener
     	this.add(txtarQuery);
     	
     	/** Initial model for table */
-        String [] header={"name","age", "null"};
-        String [][] data={{"akash","20"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"}};
+        String [] header={"name","age", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null"};
+        String [][] data={{"akash","20"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"aapankaj","24"}};
         DefaultTableModel tableModel = new DefaultTableModel(data,header);
         
         /** JTable setup */
         resultTable = new JTable(tableModel);
+        resultTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         resultTable.setPreferredScrollableViewportSize(new Dimension(450,63));
         resultTable.setFillsViewportHeight(true);
         
-        jscrllpnlTable=new JScrollPane(resultTable);
+        jscrllpnlTable=new JScrollPane(resultTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+       // jscrllpnlTable.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         jscrllpnlTable.setBounds(177, 118, 615, 351);
         jscrllpnlTable.setVisible(true);
         add(jscrllpnlTable);
@@ -168,6 +171,10 @@ public class TableView extends JPanel implements ActionListener, KeyListener
 	
 	public JTable getResultTable(){
 		return resultTable;
+	}
+	
+	public JTextPane getTxtTime(){
+		return txtpnTime;
 	}
 	
 	public void setQueryModel(DefaultComboBoxModel model){
