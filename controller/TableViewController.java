@@ -16,7 +16,7 @@ public class TableViewController {
 
 	private TableView view;
 	private MySQLConnector connector;
-	private HashMap<String, HashMap<String, String>> queries;
+	private HashMap<String, HashMap<String, String>> queryMap;
 	private AppDatabase appDatabase;
 	
 	public TableViewController(TableView view) {
@@ -30,7 +30,7 @@ public class TableViewController {
 		connector.getConnection();
 		this.appDatabase = new AppDatabase();
 		/** Initialize list of queries */
-		this.queries = appDatabase.getMapOfQueries();
+		this.queryMap = appDatabase.getMapOfQueries();
 	}
 
 	public void submitQuery(String queryType, String optimizationType) {
@@ -47,7 +47,7 @@ public class TableViewController {
 	public void initializeViewData() {
 		/** Get keys(query list) */
 		ArrayList<String> queryList = new ArrayList<>();
-		for ( String key : queries.keySet() ) {
+		for ( String key : queryMap.keySet() ) {
 			queryList.add(key);
 		}
 		/** Set model for queries */
@@ -57,7 +57,7 @@ public class TableViewController {
 
 	public void updateOptimizationList(String queryType) {
 		/** Get value then keys(optimization list) */
-		HashMap<String, String> optimizationMap = queries.get(queryType);
+		HashMap<String, String> optimizationMap = queryMap.get(queryType);
 		ArrayList<String> optimizationList = new ArrayList<>();
 		for ( String key : optimizationMap.keySet() ) {
 			optimizationList.add(key);

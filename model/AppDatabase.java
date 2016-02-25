@@ -23,22 +23,25 @@ public class AppDatabase {
 		String queryType;
 		String optimizationType;
 		String statement;
+		
 		/** Custom */
 		queryType = "Custom";
 		/** Start of Optimization List */
-		optimizationType = "";
-		statement = "";
 		queryStatementsBasedOnOptimization = new HashMap<>();
-		queryStatementsBasedOnOptimization.put(optimizationType, statement);
 		/** Final initialization */
 		queryStatements.put(queryType, queryStatementsBasedOnOptimization);
 		
 		/** Query 1 */
 		queryType = "Query 1";
 		/** Start of Optimization List */
-		optimizationType = "";
-		statement = "";
 		queryStatementsBasedOnOptimization = new HashMap<>();
+		
+		optimizationType = "Table rearranging thingy";
+		statement = "party party?";
+		queryStatementsBasedOnOptimization.put(optimizationType, statement);
+		
+		optimizationType = "More optimize such wow";
+		statement = "wow amazing";
 		queryStatementsBasedOnOptimization.put(optimizationType, statement);
 		/** Final initialization */
 		queryStatements.put(queryType, queryStatementsBasedOnOptimization);
