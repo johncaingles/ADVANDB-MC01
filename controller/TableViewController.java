@@ -3,6 +3,7 @@ package controller;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.table.TableModel;
@@ -16,7 +17,7 @@ public class TableViewController {
 
 	private TableView view;
 	private MySQLConnector connector;
-	private HashMap<String, HashMap<String, String>> queryMap;
+	private LinkedHashMap<String, LinkedHashMap<String, String>> queryMap;
 	private AppDatabase appDatabase;
 	
 	public TableViewController(TableView view) {
@@ -44,6 +45,11 @@ public class TableViewController {
 		view.getTxtTime().setText(Long.toString(connector.getExeTime())+ " ms");
 	}
 
+	public void executeCustomStatement(String query) {
+		connector.executeStatement(query);
+		view.getTxtTime().setText(Long.toString(connector.getExeTime())+ " ms");
+	}
+	
 	public void initializeViewData() {
 		/** Get keys(query list) */
 		ArrayList<String> queryList = new ArrayList<>();
@@ -66,6 +72,12 @@ public class TableViewController {
 		DefaultComboBoxModel queryModel = new DefaultComboBoxModel( optimizationList.toArray() );
 		view.setOptimizationListModel(queryModel);	
 	}
+
+	public void updateQueryTxtArea(String queryType, String optimizationType) {
+		String query = queryMap.get(queryType).get(optimizationType);
+		view.setQueryTextArea(query);
+	}
+
 	
 	
 	
