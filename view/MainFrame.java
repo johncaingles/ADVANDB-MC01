@@ -2,12 +2,23 @@ package view;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
+import javax.swing.UIManager.LookAndFeelInfo;
 
 public class MainFrame extends JFrame {
 
 	private JPanel currentPanel;
 	
 	public MainFrame(String appName) {
+		try {
+            for (LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (Exception e) {
+        }
 		/** Frame setup */
 		this.setTitle(appName);
 		this.setResizable(false);
