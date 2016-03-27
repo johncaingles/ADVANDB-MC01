@@ -26,6 +26,8 @@ public class OLAPViewController {
 	private String groupByStatement;
 	
 	private int locationHierarchy;
+	private int accessibilityHierarchy;
+	private int educationHierarchy;
 	
 	public OLAPViewController(OLAPView view) {
 		this.view = view;
@@ -47,6 +49,8 @@ public class OLAPViewController {
 		groupByStatement = "GROUP BY ";
 		
 		locationHierarchy = 0;
+		accessibilityHierarchy = 0;
+		educationHierarchy = 0;
 		
 		refreshQuery();
 	}
@@ -158,6 +162,36 @@ public class OLAPViewController {
 				locationHierarchy=4;
 			}
 		}
+		
+		if(attribute.equals("accessibility")){
+			accessibilityHierarchy++;
+			selectClause = getClauseForHierarchy("accessibility", accessibilityHierarchy);
+			groupByClause = getClauseForHierarchy("accessibility", accessibilityHierarchy);
+			
+//			this.selectStatement += selectClause +  ",";
+//			this.groupByStatement += groupByClause + ",";
+			this.selectStatement += selectClause;
+			this.groupByStatement += groupByClause;
+
+			if(accessibilityHierarchy>2){
+				accessibilityHierarchy=2;
+			}
+		}
+		
+		if(attribute.equals("education")){
+			educationHierarchy++;
+			selectClause = getClauseForHierarchy("education", educationHierarchy)+"educ_name,";
+			groupByClause = getClauseForHierarchy("education", educationHierarchy);
+			
+//			this.selectStatement += selectClause +  ",";
+//			this.groupByStatement += groupByClause + ",";
+			this.selectStatement += selectClause;
+			this.groupByStatement += groupByClause;
+
+			if(educationHierarchy>1){
+				educationHierarchy=1;
+			}
+		}
 	}
 	
 	private String getClauseForHierarchy(String attribute, int hierarchy) {
@@ -170,6 +204,27 @@ public class OLAPViewController {
 				case 2 : finalClause="prov,"; break;
 				case 3 : finalClause="mun,"; break;
 				case 4 : finalClause="brgy,"; break;
+				default: finalClause="";
+			}
+			
+			return finalClause;
+		}
+		
+		if(attribute.equals("accessibility")){
+			switch(hierarchy) {
+				case 0 : finalClause=""; break;
+				case 1 : finalClause="welec,"; break;
+				case 2 : finalClause="radio,tv,computer,internet,"; break;
+				default: finalClause="";
+			}
+			
+			return finalClause;
+		}
+		
+		if(attribute.equals("education")){
+			switch(hierarchy) {
+				case 0 : finalClause=""; break;
+				case 1 : finalClause="educ_id,"; break;
 				default: finalClause="";
 			}
 			
@@ -194,6 +249,32 @@ public class OLAPViewController {
 			
 			if(locationHierarchy<=0){
 				locationHierarchy=0;
+			}
+		}
+		
+		if(attribute.equals("accessibility")){
+			selectClause = getClauseForHierarchy("accessibility", accessibilityHierarchy);
+			groupByClause = getClauseForHierarchy("accessibility", accessibilityHierarchy);
+			accessibilityHierarchy--;
+			
+			this.selectStatement = this.selectStatement.replace(selectClause, "");
+			this.groupByStatement = this.groupByStatement.replace(groupByClause, "");
+			
+			if(accessibilityHierarchy<=0){
+				accessibilityHierarchy=0;
+			}
+		}
+		
+		if(attribute.equals("education")){
+			selectClause = getClauseForHierarchy("education", educationHierarchy)+"educ_name,";
+			groupByClause = getClauseForHierarchy("education", educationHierarchy);
+			educationHierarchy--;
+			
+			this.selectStatement = this.selectStatement.replace(selectClause, "");
+			this.groupByStatement = this.groupByStatement.replace(groupByClause, "");
+			
+			if(educationHierarchy<=0){
+				educationHierarchy=0;
 			}
 		}
 		

@@ -21,6 +21,7 @@ import javax.swing.table.DefaultTableModel;
 import controller.OLAPViewController;
 import javax.swing.JCheckBox;
 import javax.swing.SwingConstants;
+import javax.swing.JSeparator;
 
 public class OLAPView extends JPanel implements ActionListener, KeyListener{
 
@@ -45,6 +46,13 @@ public class OLAPView extends JPanel implements ActionListener, KeyListener{
 	private JButton btnLocationRollUp;
 	private JLabel lblSliceAndDice;
 	private JCheckBox chckbxRegisteredVoter;
+	private JLabel lblOlapOperations;
+	private JButton btnAccessibilityRollUp;
+	private JButton btnAccessibilityDrillDown;
+	private JButton btnEducationRollUp;
+	private JButton btnEducationDrillDown;
+	private JCheckBox chckbxUnregisteredVoter;
+	private JCheckBox chckbxOverseasFilipinoWorker;
 	
     public OLAPView(MainFrame mainFrame)
     {
@@ -61,7 +69,7 @@ public class OLAPView extends JPanel implements ActionListener, KeyListener{
     	
     	txtarQuery = new JTextArea();
     	txtarQuery.setToolTipText("Enter query here");
-    	txtarQuery.setBounds(276, 13, 417, 146);
+    	txtarQuery.setBounds(276, 13, 417, 165);
     	this.add(txtarQuery);
     	
     	/** Initial model for table */
@@ -77,19 +85,19 @@ public class OLAPView extends JPanel implements ActionListener, KeyListener{
         
         jscrllpnlTable=new JScrollPane(resultTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
        // jscrllpnlTable.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jscrllpnlTable.setBounds(276, 170, 516, 299);
+        jscrllpnlTable.setBounds(276, 189, 516, 280);
         jscrllpnlTable.setVisible(true);
         add(jscrllpnlTable);
         
-        lblTime = new JLabel("Time");
-        lblTime.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        lblTime.setBounds(10, 395, 157, 20);
+        lblTime = new JLabel("Execution Time");
+        lblTime.setFont(new Font("Tahoma", Font.BOLD, 15));
+        lblTime.setBounds(10, 395, 256, 20);
         add(lblTime);
         
         txtpnTime = new JTextPane();
         txtpnTime.setText("0ms");
         txtpnTime.setFont(new Font("Tahoma", Font.PLAIN, 30));
-        txtpnTime.setBounds(10, 426, 157, 43);
+        txtpnTime.setBounds(10, 426, 256, 43);
         add(txtpnTime);
         
         btnExecute = new JButton("Execute");
@@ -99,33 +107,98 @@ public class OLAPView extends JPanel implements ActionListener, KeyListener{
         add(btnExecute);
         
         chckbxLegalAge = new JCheckBox("Legal Age");
-        chckbxLegalAge.setBounds(10, 257, 126, 23);
+        chckbxLegalAge.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        chckbxLegalAge.setBounds(10, 244, 256, 23);
         chckbxLegalAge.addActionListener(this);
         add(chckbxLegalAge);
         
         btnLocationDrillDown = new JButton("Drill Down");
-        btnLocationDrillDown.setBounds(177, 141, 89, 23);
+        btnLocationDrillDown.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnLocationDrillDown.setBounds(177, 87, 89, 23);
         btnLocationDrillDown.addActionListener(this);
         add(btnLocationDrillDown);
         
         JLabel lblLocation = new JLabel("Location");
+        lblLocation.setFont(new Font("Tahoma", Font.PLAIN, 11));
         lblLocation.setHorizontalAlignment(SwingConstants.CENTER);
-        lblLocation.setBounds(109, 141, 58, 23);
+        lblLocation.setBounds(109, 87, 58, 23);
         add(lblLocation);
         
         btnLocationRollUp = new JButton("Roll Up");
-        btnLocationRollUp.setBounds(10, 141, 89, 23);
+        btnLocationRollUp.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnLocationRollUp.setBounds(10, 87, 89, 23);
         btnLocationRollUp.addActionListener(this);
         add(btnLocationRollUp);
         
         lblSliceAndDice = new JLabel("Slice and Dice");
-        lblSliceAndDice.setBounds(10, 204, 258, 20);
+        lblSliceAndDice.setFont(new Font("Tahoma", Font.BOLD, 15));
+        lblSliceAndDice.setBounds(10, 217, 258, 20);
         add(lblSliceAndDice);
         
         chckbxRegisteredVoter = new JCheckBox("Registered Voter ");
-        chckbxRegisteredVoter.setBounds(10, 283, 126, 23);
+        chckbxRegisteredVoter.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        chckbxRegisteredVoter.setBounds(10, 270, 256, 23);
         chckbxRegisteredVoter.addActionListener(this);
         add(chckbxRegisteredVoter);
+        
+        JLabel lblRollUpAndDrillDown = new JLabel("Roll Up and Drill Down");
+        lblRollUpAndDrillDown.setFont(new Font("Tahoma", Font.BOLD, 15));
+        lblRollUpAndDrillDown.setBounds(10, 56, 258, 20);
+        add(lblRollUpAndDrillDown);
+        
+        btnAccessibilityRollUp = new JButton("Roll Up");
+        btnAccessibilityRollUp.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnAccessibilityRollUp.setBounds(10, 121, 89, 23);
+        btnAccessibilityRollUp.addActionListener(this);
+        add(btnAccessibilityRollUp);
+        
+        JLabel lblAccessibility = new JLabel("Accessibility");
+        lblAccessibility.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        lblAccessibility.setHorizontalAlignment(SwingConstants.CENTER);
+        lblAccessibility.setBounds(109, 121, 58, 23);
+        add(lblAccessibility);
+        
+        btnAccessibilityDrillDown = new JButton("Drill Down");
+        btnAccessibilityDrillDown.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnAccessibilityDrillDown.setBounds(177, 121, 89, 23);
+        btnAccessibilityDrillDown.addActionListener(this);
+        add(btnAccessibilityDrillDown);
+        
+        btnEducationRollUp = new JButton("Roll Up");
+        btnEducationRollUp.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnEducationRollUp.setBounds(10, 155, 89, 23);
+        btnEducationRollUp.addActionListener(this);
+        add(btnEducationRollUp);
+        
+        JLabel lblEducation = new JLabel("Education");
+        lblEducation.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        lblEducation.setHorizontalAlignment(SwingConstants.CENTER);
+        lblEducation.setBounds(109, 155, 58, 23);
+        add(lblEducation);
+        
+        btnEducationDrillDown = new JButton("Drill Down");
+        btnEducationDrillDown.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnEducationDrillDown.setBounds(177, 155, 89, 23);
+        btnEducationDrillDown.addActionListener(this);
+        add(btnEducationDrillDown);
+        
+        chckbxUnregisteredVoter = new JCheckBox("Unregistered Voter");
+        chckbxUnregisteredVoter.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        chckbxUnregisteredVoter.setBounds(10, 296, 256, 23);
+        chckbxUnregisteredVoter.addActionListener(this);
+        add(chckbxUnregisteredVoter);
+        
+        chckbxOverseasFilipinoWorker = new JCheckBox("Overseas Filipino Worker (OFW)");
+        chckbxOverseasFilipinoWorker.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        chckbxOverseasFilipinoWorker.setBounds(10, 322, 256, 23);
+        chckbxOverseasFilipinoWorker.addActionListener(this);
+        add(chckbxOverseasFilipinoWorker);
+        
+        lblOlapOperations = new JLabel("OLAP Operations");
+        lblOlapOperations.setHorizontalAlignment(SwingConstants.CENTER);
+        lblOlapOperations.setFont(new Font("Tahoma", Font.BOLD, 15));
+        lblOlapOperations.setBounds(8, 13, 258, 20);
+        add(lblOlapOperations);
         
         controller.initializeViewData();
     	refreshTxtQuery();
@@ -162,6 +235,24 @@ public class OLAPView extends JPanel implements ActionListener, KeyListener{
 			refreshTxtQuery();
 		}
 		
+		if(ae.getSource() == chckbxUnregisteredVoter) {
+			String clause = "c.registered_voter=2";
+			
+			if(chckbxUnregisteredVoter.isSelected())
+				controller.addSliceAndDice(clause);
+			else controller.removeSliceAndDice(clause);
+			refreshTxtQuery();
+		}
+		
+		if(ae.getSource() == chckbxOverseasFilipinoWorker) {
+			String clause = "c.ofw=1";
+			
+			if(chckbxOverseasFilipinoWorker.isSelected())
+				controller.addSliceAndDice(clause);
+			else controller.removeSliceAndDice(clause);
+			refreshTxtQuery();
+		}
+		
 		/** Drill down roll up */		
 		/** LOCATION */
 		if(ae.getSource() == btnLocationDrillDown) {
@@ -174,6 +265,36 @@ public class OLAPView extends JPanel implements ActionListener, KeyListener{
 		
 		if(ae.getSource() == btnLocationRollUp) {
 			String attribute = "location";
+					
+			controller.rollUp(attribute);
+			refreshTxtQuery();
+		}
+		/** ACCESSIBILITY */
+		if(ae.getSource() == btnAccessibilityDrillDown) {
+			String attribute = "accessibility";
+			
+			// TODO add drill down
+			controller.drillDown(attribute);
+			refreshTxtQuery();
+		}
+		
+		if(ae.getSource() == btnAccessibilityRollUp) {
+			String attribute = "accessibility";
+					
+			controller.rollUp(attribute);
+			refreshTxtQuery();
+		}
+		
+		if(ae.getSource() == btnEducationDrillDown) {
+			String attribute = "education";
+			
+			// TODO add drill down
+			controller.drillDown(attribute);
+			refreshTxtQuery();
+		}
+		
+		if(ae.getSource() == btnEducationRollUp) {
+			String attribute = "education";
 					
 			controller.rollUp(attribute);
 			refreshTxtQuery();
