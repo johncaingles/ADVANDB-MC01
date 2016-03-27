@@ -9,6 +9,6 @@ public class Driver
 {	
 	public static void main (String[]args)
 	{
-		new MainFrame("ADVANDB MC01").renderView("Table View");
+		new MainFrame("ADVANDB MC01").renderView("Queries View");
 	}
 }

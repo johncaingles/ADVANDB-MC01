@@ -74,8 +74,8 @@ public class TableView extends JPanel implements ActionListener, KeyListener
     	this.add(txtarQuery);
     	
     	/** Initial model for table */
-        String [] header={"name","age", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null", "null"};
-        String [][] data={{"akash","20"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"pankaj","24"},{"aapankaj","24"}};
+        String [] header={};
+        String [][] data={};
         DefaultTableModel tableModel = new DefaultTableModel(data,header);
         
         /** JTable setup */

@@ -30,8 +30,11 @@ public class MainFrame extends JFrame {
 	}
 
 	public void renderView(String view) {
-		if(view.equals("Table View")) {
+		if(view.equals("Queries View")) {
 			currentPanel = new TableView(this); 
+		} else 
+		if (view.equals("Customizable OLAP")) {
+			currentPanel = new OLAPView(this);
 		}
 		
 		this.setContentPane((JPanel) currentPanel);   
