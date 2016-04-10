@@ -102,6 +102,13 @@ public class PeerToPeerDBController {
         appendToLog("Received incoming transaction");
         System.out.println("recevied Query" + transaction.getQuery());
         System.out.println("recevied Type" + transaction.getType());
+
+        /** AYAN BASTA EXECUTE KASI WALANG LINALABAS PERO SUBMIT MERON OH YEAH */
+        if(transaction.getType().equals("write"))
+            executeCustomStatement(transaction.getQuery());
+        else if (transaction.getType().equals("read")) {
+            submitCustomStatement(transaction.getQuery());
+        }
         submitCustomStatement(transaction.getQuery());
     }
 
