@@ -7,8 +7,13 @@ import java.util.LinkedHashMap;
 import utilities.dbconnection.MySQLConnector;
 
 public class AppDatabase {
-	
-	private LinkedHashMap<String, LinkedHashMap<String, String>> queryStatements;
+
+	public static final int PALAWAN_NODE_CONSTANT = 1;
+    public static final int MARINDUQUE_NODE_CONSTANT = 2;
+    public static final int CENTRAL_NODE_CONSTANT = 3;
+    public static final int PORT_NUMBER = 1235;
+
+    private LinkedHashMap<String, LinkedHashMap<String, String>> queryStatements;
 	private LinkedHashMap<String, String> queryInfos;
 	
 	public AppDatabase(){

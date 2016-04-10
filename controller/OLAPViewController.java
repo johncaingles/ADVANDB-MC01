@@ -33,7 +33,7 @@ public class OLAPViewController {
 		this.view = view;
 		this.connector = new MySQLConnector(
 				"jdbc:mysql://localhost:3306/", 
-				"advandb_mco2", 
+				"db_hpq", 
 				"com.mysql.jdbc.Driver", 
 				"root", 
 				"p@ssword");
@@ -158,8 +158,8 @@ public class OLAPViewController {
 			this.selectStatement += selectClause;
 			this.groupByStatement += groupByClause;
 
-			if(locationHierarchy>4){
-				locationHierarchy=4;
+			if(locationHierarchy>3){
+				locationHierarchy=3;
 			}
 		}
 		
@@ -200,10 +200,9 @@ public class OLAPViewController {
 		if(attribute.equals("location")){
 			switch(hierarchy) {
 				case 0 : finalClause=""; break;
-				case 1 : finalClause="regn,"; break;
-				case 2 : finalClause="prov,"; break;
-				case 3 : finalClause="mun,"; break;
-				case 4 : finalClause="brgy,"; break;
+				case 1 : finalClause="mun,"; break;
+				case 2 : finalClause="zone,"; break;
+				case 3 : finalClause="brgy,"; break;
 				default: finalClause="";
 			}
 			

@@ -1,5 +1,7 @@
 package view;
 
+import model.AppDatabase;
+
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -35,6 +37,15 @@ public class MainFrame extends JFrame {
 		} else 
 		if (view.equals("Customizable OLAP")) {
 			currentPanel = new OLAPView(this);
+		}else 
+		if (view.equals("PeerToPeerDB-Central")) {
+			currentPanel = new PeerToPeerDBView(this, AppDatabase.CENTRAL_NODE_CONSTANT);
+		}else
+		if (view.equals("PeerToPeerDB-Palawan")) {
+			currentPanel = new PeerToPeerDBView(this, AppDatabase.PALAWAN_NODE_CONSTANT);
+		} else
+		if (view.equals("PeerToPeerDB-Marinduque")) {
+			currentPanel = new PeerToPeerDBView(this, AppDatabase.MARINDUQUE_NODE_CONSTANT);
 		}
 		
 		this.setContentPane((JPanel) currentPanel);   
