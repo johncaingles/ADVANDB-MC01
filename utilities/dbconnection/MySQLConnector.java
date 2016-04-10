@@ -1,10 +1,6 @@
 package utilities.dbconnection;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -63,6 +59,28 @@ public class MySQLConnector {
             Logger.getLogger(MySQLConnector.class.getName()).log(Level.SEVERE, null, ex);
         }
         return result;
+    }
+
+    public void updateIsolationLevel(String isoLevel){
+        String isolationQuery = "SET SESSION TRANSACTION ISOLATION LEVEL " + isoLevel;
+        try{
+            PreparedStatement pstmt;
+            try(Connection conn = MySQLConnector.getConnection()){
+                pstmt = conn.prepareStatement(isolationQuery);
+                pstmt.executeUpdate();
+
+                pstmt = conn.prepareStatement("SELECT @@tx_isolation");
+                ResultSet rs = pstmt.executeQuery();
+
+                while (rs.next()){
+                    System.out.println(rs.getString("@@tx_isolation"));
+                }
+            }
+            pstmt.close();
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
     
     public long getExeTime()

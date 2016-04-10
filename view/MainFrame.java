@@ -39,13 +39,16 @@ public class MainFrame extends JFrame {
 			currentPanel = new OLAPView(this);
 		}else 
 		if (view.equals("PeerToPeerDB-Central")) {
-			currentPanel = new PeerToPeerDBView(this, AppDatabase.CENTRAL_NODE_CONSTANT);
+			currentPanel = new PeerToPeerDBView(this, AppDatabase.CENTRAL_NODE_ID);
+            this.setTitle("Central Node");
 		}else
+        if (view.equals("PeerToPeerDB-Marinduque")) {
+            currentPanel = new PeerToPeerDBView(this, AppDatabase.MARINDUQUE_NODE_ID);
+            this.setTitle("Marinduque Node");
+        }else
 		if (view.equals("PeerToPeerDB-Palawan")) {
-			currentPanel = new PeerToPeerDBView(this, AppDatabase.PALAWAN_NODE_CONSTANT);
-		} else
-		if (view.equals("PeerToPeerDB-Marinduque")) {
-			currentPanel = new PeerToPeerDBView(this, AppDatabase.MARINDUQUE_NODE_CONSTANT);
+			currentPanel = new PeerToPeerDBView(this, AppDatabase.PALAWAN_NODE_ID);
+            this.setTitle("Palawan Node");
 		}
 		
 		this.setContentPane((JPanel) currentPanel);   

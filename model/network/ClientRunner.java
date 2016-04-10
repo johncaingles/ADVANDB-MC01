@@ -1,4 +1,4 @@
-package controller;
+package model.network;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -32,7 +32,7 @@ public class ClientRunner implements Runnable {
 	        /** --------------------------- USEFULL SHIT YUNG SA TAAS ---------------------- **/
 	        
 //	        Transaction msgFrmServer = (Transaction)inFromServer.readObject();
-//	        System.out.println(msgFrmServer.getQuery());
+//	        System.out.println(msgFrmServer.getQueryStatement());
 //	        socketToHost.close();
 
 	    } catch (Exception e) {
@@ -42,10 +42,10 @@ public class ClientRunner implements Runnable {
 	    }	
 	}
 	
-	public void sendTransactionToClient(Transaction transaction, String ipAddress){
+	public void sendTransactionToClient(Transaction transaction, String ipAddress, int portNumber){
 		
 		try {
-			Socket clientSocket = new Socket(ipAddress, AppDatabase.PORT_NUMBER);
+			Socket clientSocket = new Socket(ipAddress, portNumber);
 			 ObjectOutputStream outToClient;
 			outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
 			outToClient.writeObject(transaction);

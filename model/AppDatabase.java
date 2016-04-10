@@ -8,10 +8,18 @@ import utilities.dbconnection.MySQLConnector;
 
 public class AppDatabase {
 
-	public static final int PALAWAN_NODE_CONSTANT = 1;
-    public static final int MARINDUQUE_NODE_CONSTANT = 2;
-    public static final int CENTRAL_NODE_CONSTANT = 3;
-    public static final int PORT_NUMBER = 1235;
+    public static final int CENTRAL_NODE_ID = 0;
+    public static final int MARINDUQUE_NODE_ID = 2;
+	public static final int PALAWAN_NODE_ID = 1;
+
+    public static final int CENTRAL_PORT_NUMBER = 1234;
+    public static final int MARINDUQUE_PORT_NUMBER = 1233;
+    public static final int PALAWAN_PORT_NUMBER = 1235;
+
+    public static String CENTRAL_IP_ADDRESS    = "localhost";
+    public static String MARINDUQUE_IP_ADDRESS = "localhost";
+    public static String PALAWAN_IP_ADDRESS    = "localhost";
+
 
     private LinkedHashMap<String, LinkedHashMap<String, String>> queryStatements;
 	private LinkedHashMap<String, String> queryInfos;

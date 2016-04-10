@@ -7,15 +7,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import javax.swing.JButton;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
-import javax.swing.JTextPane;
+import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
 
 import controller.PeerToPeerDBController;
 
@@ -24,9 +18,9 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 	private MainFrame mainFrame;
 	private JScrollPane jscrllpnlTable;
 	private JLabel lblQuery;
-	private JComboBox cmbbxQuery;
-	private JComboBox cmbbxIsolationType;
-	private JComboBox cmbbxType;
+	private JComboBox cmbbxQueryNode;
+	private JComboBox cmbbxIsolationLevel;
+	private JComboBox cmbbxQueryType;
 	private JLabel lblQueryDetails;
 	private JLabel lblTime;
 	private JTextPane txtpnTime;
@@ -76,26 +70,26 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 		lblIsolationLevel.setBounds(10, 69, 89, 14);
 		add(lblIsolationLevel);
 
-		cmbbxQuery = new JComboBox();
-		cmbbxQuery.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		cmbbxQuery.setBounds(10, 38, 157, 20);
-		cmbbxQuery.addActionListener(this);
-		/** stuff */
-		cmbbxQuery.addItem("Palawan");
-		cmbbxQuery.addItem("Marinduque");
-		cmbbxQuery.addItem("Central");
-		add(cmbbxQuery);
+		cmbbxQueryNode = new JComboBox();
+		cmbbxQueryNode.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		cmbbxQueryNode.setBounds(10, 38, 157, 20);
+		cmbbxQueryNode.addActionListener(this);
+        /** DO NOT REARRANGE LIST ORDER HAHA DIS IS CRUICIAL */
+        cmbbxQueryNode.addItem("Central");
+        cmbbxQueryNode.addItem("Marinduque");
+		cmbbxQueryNode.addItem("Palawan");
+		add(cmbbxQueryNode);
 
-		cmbbxIsolationType = new JComboBox();
-		cmbbxIsolationType.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		cmbbxIsolationType.setBounds(10, 87, 157, 20);
-		cmbbxIsolationType.addActionListener(this);
-		/** stuff */
-		cmbbxIsolationType.addItem("Read uncommited");
-		cmbbxIsolationType.addItem("Read commited");
-		cmbbxIsolationType.addItem("Read repeatable");
-		cmbbxIsolationType.addItem("Serializable");
-		add(cmbbxIsolationType);
+		cmbbxIsolationLevel = new JComboBox();
+		cmbbxIsolationLevel.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		cmbbxIsolationLevel.setBounds(10, 87, 157, 20);
+		cmbbxIsolationLevel.addActionListener(this);
+        /** DO NOT REARRANGE LIST ORDER HAHA DIS IS CRUICIAL */
+		cmbbxIsolationLevel.addItem("Read uncommited");
+		cmbbxIsolationLevel.addItem("Read commited");
+		cmbbxIsolationLevel.addItem("Read repeatable");
+		cmbbxIsolationLevel.addItem("Serializable");
+		add(cmbbxIsolationLevel);
 
 		lblQueryDetails = new JLabel("Logs");
 		lblQueryDetails.setFont(new Font("Tahoma", Font.PLAIN, 11));
@@ -123,12 +117,13 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 		txtarLog.setBounds(177, 28, 615, 133);
 		add(txtarLog);
 
-		cmbbxType = new JComboBox();
-		cmbbxType.setFont(new Font("Tahoma", Font.PLAIN, 11));
-		cmbbxType.setBounds(10, 136, 157, 20);
-		cmbbxType.addItem("Read");
-		cmbbxType.addItem("Write");
-		add(cmbbxType);
+		cmbbxQueryType = new JComboBox();
+		cmbbxQueryType.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		cmbbxQueryType.setBounds(10, 136, 157, 20);
+		cmbbxQueryType.addItem("Read");
+		cmbbxQueryType.addItem("Write");
+        cmbbxQueryType.addActionListener(this);
+		add(cmbbxQueryType);
 
 		JLabel lblQuery_1 = new JLabel("Query");
 		lblQuery_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
@@ -144,35 +139,29 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 		lblType.setFont(new Font("Tahoma", Font.PLAIN, 11));
 		lblType.setBounds(10, 112, 157, 24);
 		add(lblType);
+
+        controller.initializeUI();
 	}
 
 	@Override
 	public void actionPerformed(ActionEvent ae) {
-/*		if((ae.getSource() == btnSubmit || ae.getSource() == btnExecute)) {
-
-			String query = getInputQuery();
-			if(ae.getSource() == btnSubmit)
-				controller.submitCustomStatement(query);
-			else controller.executeCustomStatement(query);
-			txtarQuery.setEditable(true);
-		} else */
-		if(ae.getSource() == cmbbxQuery){
-			controller.setQueryType(getInputQueryType());
-		} else
-		if(ae.getSource() == cmbbxIsolationType){
-			controller.setIsolationType(getInputIsolationType());
+		if(ae.getSource() == cmbbxQueryType){
+            String query = controller.getQueryStatement(getInputQueryType(), getInputQueryNode());
+            setQueryTextArea(query);
 		} else
 		if(ae.getSource() == btnSend){
 			String ip = "hi, this is where you change the IP";
-			if(cmbbxQuery.getSelectedItem().toString().equalsIgnoreCase("Palawan"))
-				ip = "192.162.1.8";
-			else if(cmbbxQuery.getSelectedItem().toString().equalsIgnoreCase("Marinduque"))
-				ip = "192.162.1.9";
-			else if(cmbbxQuery.getSelectedItem().toString().equalsIgnoreCase("Central"))
-				ip = "192.162.1.10";
-			String msg = txtarQuery.getText();
-			String type = cmbbxType.getSelectedItem().toString();
-			controller.queryToNode(ip, msg, type);
+//			if(cmbbxQueryNode.getSelectedItem().toString().equalsIgnoreCase("Palawan"))
+//				ip = "192.162.1.8";
+//			else if(cmbbxQueryNode.getSelectedItem().toString().equalsIgnoreCase("Marinduque"))
+//				ip = "192.162.1.9";
+//			else if(cmbbxQueryNode.getSelectedItem().toString().equalsIgnoreCase("Central"))
+//				ip = "192.162.1.10";
+			String targetNode = getInputQueryNode();
+			String query = getInputQuery();
+			String type = getInputQueryType();
+            String isolationLevel = cmbbxIsolationLevel.getSelectedItem().toString();
+			controller.sendTransactonFromGUI(targetNode, query, type, isolationLevel);
 		}
 	}
 
@@ -183,20 +172,25 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 //		setQueryTextArea(controller.getFinalQuery());
 //	}
 
-	private String getInputQueryType() {
-		String input = cmbbxQuery.getSelectedItem().toString();
+	public String getInputQueryNode() {
+		String input = cmbbxQueryNode.getSelectedItem().toString();
 		return input;
 	}
 
-	private String getInputIsolationType() {
-		String input = cmbbxIsolationType.getSelectedItem().toString();
+    public String getInputIsolationType() {
+		String input = cmbbxIsolationLevel.getSelectedItem().toString();
 		return input;
 	}
 
-	private String getInputQuery() {
+    public String getInputQuery() {
 		String input = txtarQuery.getText();
 		return input;
 	}
+
+    public String getInputQueryType() {
+        String input = cmbbxQueryType.getSelectedItem().toString();
+        return input;
+    }
 
 	public JTable getResultTable(){
 		return resultTable;
@@ -205,14 +199,6 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 	public JTextPane getTxtTime(){
 		return txtpnTime;
 	}
-
-//	public void setQueryModel(DefaultComboBoxModel model){
-//		cmbbxQuery.setModel(model);
-//	}
-//
-//	public void setOptimizationListModel(DefaultComboBoxModel queryModel) {
-//		cmbbxOptimizationType.setModel(queryModel);		
-//	}
 
 	@Override
 	public void keyPressed(KeyEvent arg0) {
@@ -232,6 +218,17 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 
 	}
 
+    public void setCmbbxQueryNode(DefaultComboBoxModel model){
+        cmbbxQueryNode.setModel(model);
+    }
+
+    public void setCmbbxIsolationLevel(DefaultComboBoxModel model){
+        cmbbxIsolationLevel.setModel(model);
+    }
+
+    public void setCmbbxQueryType(DefaultComboBoxModel model){
+        cmbbxQueryType.setModel(model);
+    }
 	public void setQueryTextArea(String query) {
 		txtarQuery.setText(query);
 	}
@@ -243,4 +240,8 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 	public String getLogText(){
 		return txtarLog.getText();
 	}
+
+    public void setResultTableModel(TableModel resultModel) {
+        this.resultTable.setModel(resultModel);
+    }
 }
