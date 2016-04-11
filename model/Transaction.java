@@ -18,22 +18,33 @@ public class Transaction implements Serializable {
     public static final int RESPONSE_WRITE_SUCCESS   = 8;
     public static final int RESPONSE_WRITE_FAIL      = 9;
 
+    public static final int AVAILABILITY_BROADCAST = 10;
+
     /** attributes */
     private String queryStatement;
 	private int transactionType;
     private int sourceNodeId;
+    private int affectedNodeId;
 	private TableModel resultModel;
 
-    public Transaction(int transactionType, TableModel resultModel, int sourceNodeId) {
+    public Transaction(int transactionType, TableModel resultModel, int sourceNodeId, int affectedNodeId) {
         this.transactionType = transactionType;
         this.resultModel = resultModel;
         this.sourceNodeId = sourceNodeId;
     }
 
-    public Transaction(String queryStatement, int transactionType, int sourceNodeId) {
+    public Transaction(String queryStatement, int transactionType, int sourceNodeId, int affectedNodeId) {
         this.queryStatement = queryStatement;
         this.transactionType = transactionType;
         this.sourceNodeId = sourceNodeId;
+    }
+
+    public int getAffectedNodeId() {
+        return affectedNodeId;
+    }
+
+    public void setAffectedNodeId(int affectedNodeId) {
+        this.affectedNodeId = affectedNodeId;
     }
 
     public int getSourceNodeId() {

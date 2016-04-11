@@ -17,8 +17,16 @@ public class AppDatabase {
     public static final int PALAWAN_PORT_NUMBER = 1235;
 
     public static String CENTRAL_IP_ADDRESS    = "localhost";
+//    public static String MARINDUQUE_IP_ADDRESS = "10.100.202.196";
+//    public static String PALAWAN_IP_ADDRESS    = "10.100.208.112";
     public static String MARINDUQUE_IP_ADDRESS = "localhost";
     public static String PALAWAN_IP_ADDRESS    = "localhost";
+
+	/** 1 means available */
+    /** -1 is down */
+	public static int CENTRAL_AVAILABILITY = -1;
+	public static int MARINDUQUE_AVAILABILITY = 1;
+	public static int PALAWAN_AVAILABILITY = 1;
 
 
     private LinkedHashMap<String, LinkedHashMap<String, String>> queryStatements;

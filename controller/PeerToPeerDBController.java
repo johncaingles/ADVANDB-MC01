@@ -18,6 +18,7 @@ public class PeerToPeerDBController {
 	
 	/** Network stuff */
 	private ServerRunner serverRunner;
+//    private BroadcastRunner broadcastRunner;
 
     /** Model stuff */
     private int nodeId;
@@ -43,9 +44,16 @@ public class PeerToPeerDBController {
 		
 		/** network stuff */
 		startServer();
+//        startAvailabilityChecker();
 	}
-	
-	private void startServer() {
+
+//    private void startAvailabilityChecker() {
+//        broadcastRunner = new BroadcastRunner(this);
+//        Thread availabilityChecker = new Thread(broadcastRunner);
+//        availabilityChecker.start();
+//    }
+
+    private void startServer() {
 		ServerSocket serverSocket = null ;
 		try {
             serverSocket = new ServerSocket(getPortNumberFromId(this.nodeId));
@@ -57,7 +65,9 @@ public class PeerToPeerDBController {
 		}
 	}
 
-	public void queryAndShowResult(String query) {
+
+
+    public void queryAndShowResult(String query) {
 		ResultSet resultSet = connector.executeQuery(query);
 		TableModel model = DbUtils.resultSetToTableModel(resultSet);
 		view.getResultTable().setModel(model);
@@ -94,7 +104,7 @@ public class PeerToPeerDBController {
                 /** check if success */
                 int responseTransactionType;
                 responseTransactionType = Transaction.RESPONSE_READ_SUCCESS;
-                Transaction transactionResponse = new Transaction(Transaction.RESPONSE_READ_SUCCESS, resultModel, nodeId);
+                Transaction transactionResponse = new Transaction(Transaction.RESPONSE_READ_SUCCESS, resultModel, nodeId, transaction.getAffectedNodeId());
 
                 /** send response */
                 sendTransactionToNode(transactionResponse, transaction.getSourceNodeId());
@@ -107,10 +117,11 @@ public class PeerToPeerDBController {
         }
     }
 
-    public void sendTransactonFromGUI(String targetNode, String query, String queryType, String isolationLevel) {
+    public void sendTransactionFromGUI(String targetNode, String query, String queryType, String isolationLevel) {
 
         int targetNodeId = 0;
         int transactionType = 0;
+        int affectedNodeId = 0;
 
         /** Set transaction type */
         if(queryType.equalsIgnoreCase("Read")) {
@@ -132,38 +143,61 @@ public class PeerToPeerDBController {
             transactionType = Transaction.REQUEST_WRITE;
         }
 
+        System.out.println("i am target: " + targetNode);
         /** set target node id */
         if(targetNode.equalsIgnoreCase("Palawan")) {
-            targetNodeId = AppDatabase.PALAWAN_NODE_ID;
+            affectedNodeId = AppDatabase.PALAWAN_NODE_ID;
         }
         else if(targetNode.equalsIgnoreCase("Marinduque")) {
-            targetNodeId = AppDatabase.MARINDUQUE_NODE_ID;
+            affectedNodeId = AppDatabase.MARINDUQUE_NODE_ID;
         }
         else if(targetNode.equalsIgnoreCase("Central")) {
-            targetNodeId = AppDatabase.CENTRAL_NODE_ID;
+            affectedNodeId = AppDatabase.CENTRAL_NODE_ID;
         }
 
-        Transaction transaction = new Transaction(query, transactionType, this.nodeId);
+        /** Prepare transaction */
+        Transaction transaction = new Transaction(query, transactionType, this.nodeId, affectedNodeId );
 
+        /** choose target for realzszzsz */
+        targetNodeId = chooseTargetNodeId(this.nodeId, affectedNodeId);
+        System.out.println("targetNodeId: " + targetNodeId);
         sendTransactionToNode(transaction, targetNodeId);
     }
 
-	public void sendTransactionToNode( Transaction transaction, int targetNodeId) {
+    private int chooseTargetNodeId(int nodeId, int affectedNodeId) {
 
-        /** start client as thread */
-        ClientRunner clientRunner = new ClientRunner();
-		Thread clientThread = new Thread(clientRunner);
+        int targetNodeId = -1;
+
+        /** check if reading local */
+        if(affectedNodeId == this.nodeId)
+            return targetNodeId = affectedNodeId;
+
+        switch( AppDatabase.CENTRAL_AVAILABILITY ) {
+            case 1 : targetNodeId = AppDatabase.CENTRAL_NODE_ID; break;
+            case -1 : targetNodeId = affectedNodeId; break;
+        }
+
+        return targetNodeId;
+
+    }
+
+    public void sendTransactionToNode( Transaction transaction, int targetNodeId) {
 
         String targetIpAddress = getIpAddressFromId(targetNodeId);
         int targetPortNum= getPortNumberFromId(targetNodeId);
+
         /** send transaction */
         appendToLog("Sending transaction to " + getNodeNameFromId(targetNodeId));
-        clientRunner.sendTransactionToClient(transaction, targetIpAddress, targetPortNum);
+        /** start client as thread */
+        ClientRunner clientRunner = new ClientRunner(transaction, targetIpAddress, targetPortNum);
+        Thread clientThread = new Thread(clientRunner);
+        clientThread.start();
 	}
 
     public void appendToLog(String log) {
         String logs = view.getLogText() + log + "\n" ;
         view.setLogText(logs);
+        view.scrollDownLogTxtAr();
     }
 
     public void initializeUI() {
@@ -210,12 +244,22 @@ public class PeerToPeerDBController {
     public String getQueryStatement(String inputQueryType, String inputQueryNode) {
         String queryStatement = "";
         System.out.println("queryStatement = " + queryStatement);
-        if( inputQueryType.equalsIgnoreCase("Read")) {
+        if( inputQueryType.equalsIgnoreCase("Read All")) {
             queryStatement = "SELECT *" + "\n"
-                    + "FROM hpq_hh";
+                          + "FROM hpq_hh";
         } else
-        if( inputQueryType.equalsIgnoreCase("Write")) {
-            queryStatement = "";
+        if( inputQueryType.equalsIgnoreCase("Read Item")) {
+            queryStatement = "SELECT * from hpq_hh " + "\n" +
+                    "WHERE id = 16818 ";
+        } else
+        if( inputQueryType.equalsIgnoreCase("Write - Update")) {
+            queryStatement = "UPDATE hpq_hh " + "\n" +
+                    "SET wagcsh=78000 " + "\n" +
+                    "WHERE id = 16818";
+        } else
+        if( inputQueryType.equalsIgnoreCase("Write - Delete")) {
+            queryStatement = "DELETE FROM hpq_hh  " + "\n" +
+                    "WHERE id = 16818";
         }
 
         return queryStatement;

@@ -10,30 +10,33 @@ import model.Transaction;
 
 public class ClientRunner implements Runnable {
 
+    private Transaction transaction;
+    private String ipAddress;
+    private int portNumber;
+
+    public ClientRunner(Transaction transaction, String ipAddress, int portNumber) {
+        this.transaction = transaction;
+        this.ipAddress = ipAddress;
+        this.portNumber = portNumber;
+    }
+
 	@Override
 	public void run() {
-		try {
-            // haha whut
-            // dapat runnable/ thread pa rin daw siya in case of multiple sendings
-	    } catch (Exception e) {
-	        System.err.println("Client Error: " + e.getMessage());
-	        System.err.println("Localized: " + e.getLocalizedMessage());
-	        System.err.println("Stack Trace: " + e.getStackTrace());
-	    }	
-	}
-	
-	public void sendTransactionToClient(Transaction transaction, String ipAddress, int portNumber){
-		
-		try {
-			Socket clientSocket = new Socket(ipAddress, portNumber);
-			 ObjectOutputStream outToClient;
-			outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
-			outToClient.writeObject(transaction);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		   
+
+        // haha whut
+        // dapat runnable/ thread pa rin daw siya in case of multiple sendings
+        try {
+            System.out.println("about to send ip: " + ipAddress);
+            System.out.println("about to send port: " + portNumber);
+            Socket clientSocket = new Socket(ipAddress, portNumber);
+            ObjectOutputStream outToClient;
+            outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
+            outToClient.writeObject(transaction);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
 	}
 	
 }
