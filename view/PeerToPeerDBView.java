@@ -41,6 +41,7 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
     private JButton btnAdd;
     private JList list;
     private JButton btnDelete;
+    private JTextField txtfldTimeDelay;
 
     public PeerToPeerDBView(MainFrame mainFrame, int nodeType) {
         this.setLayout(null);
@@ -101,7 +102,8 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
         add(lblQueryDetails);
 
         btnSend = new JButton("Send");
-        btnSend.setBounds(30, 426, 109, 31);
+        btnSend.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnSend.setBounds(30, 437, 109, 31);
         btnSend.addActionListener(this);
         add(btnSend);
 
@@ -150,23 +152,26 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
         txtarQuery.setToolTipText("Enter query here");
 
         btnPalawan = new JButton("Palawan");
-        btnPalawan.setBounds(30, 262, 109, 23);
+        btnPalawan.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnPalawan.setBounds(30, 307, 109, 23);
         btnPalawan.addActionListener(this);
         add(btnPalawan);
 
         btnMarinduque = new JButton("Marinduque");
-        btnMarinduque.setBounds(30, 238, 109, 23);
+        btnMarinduque.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnMarinduque.setBounds(30, 283, 109, 23);
         btnMarinduque.addActionListener(this);
         add(btnMarinduque);
 
         btnCentral = new JButton("Central");
+        btnCentral.setFont(new Font("Tahoma", Font.PLAIN, 11));
         btnCentral.addActionListener(this);
-        btnCentral.setBounds(30, 214, 109, 23);
+        btnCentral.setBounds(30, 259, 109, 23);
         add(btnCentral);
         
         JLabel lblCheckStatus = new JLabel("Check Status");
         lblCheckStatus.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        lblCheckStatus.setBounds(10, 179, 157, 24);
+        lblCheckStatus.setBounds(10, 224, 157, 24);
         add(lblCheckStatus);
         
         JLabel lblTransactions = new JLabel("Transactions");
@@ -183,14 +188,29 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 
         
         btnDelete = new JButton("Delete");
-        btnDelete.setBounds(30, 390, 109, 31);
+        btnDelete.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnDelete.setBounds(30, 395, 109, 31);
         btnDelete.addActionListener(this);
         add(btnDelete);
         
         btnAdd = new JButton("Add");
-        btnAdd.setBounds(30, 520, 109, 31);
+        btnAdd.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        btnAdd.setBounds(30, 360, 109, 31);
         btnAdd.addActionListener(this);
         add(btnAdd);
+        
+        JLabel lblTimeDelay = new JLabel("Time Delay");
+        lblTimeDelay.setBounds(10, 167, 157, 18);
+        add(lblTimeDelay);
+        
+        txtfldTimeDelay = new JTextField();
+        txtfldTimeDelay.setBounds(10, 193, 89, 32);
+        add(txtfldTimeDelay);
+        txtfldTimeDelay.setColumns(10);
+        
+        JLabel lblSeconds = new JLabel("seconds");
+        lblSeconds.setBounds(109, 193, 59, 32);
+        add(lblSeconds);
 
         controller.initializeUI();
     }
@@ -202,18 +222,12 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
             setQueryTextArea(query);
         } else
         if(ae.getSource() == btnSend){
-            String ip = "hi, this is where you change the IP";
-//			if(cmbbxQueryNode.getSelectedItem().toString().equalsIgnoreCase("Palawan"))
-//				ip = "192.162.1.8";
-//			else if(cmbbxQueryNode.getSelectedItem().toString().equalsIgnoreCase("Marinduque"))
-//				ip = "192.162.1.9";
-//			else if(cmbbxQueryNode.getSelectedItem().toString().equalsIgnoreCase("Central"))
-//				ip = "192.162.1.10";
-            String targetNode = getInputQueryNode();
-            String query = getInputQuery();
-            String type = getInputQueryType();
-            String isolationLevel = cmbbxIsolationLevel.getSelectedItem().toString();
-            controller.sendTransactionFromGUI(targetNode, query, type, isolationLevel);
+//            String targetNode = getInputQueryNode();
+//            String query = getInputQuery();
+//            String type = getInputQueryType();
+//            String isolationLevel = cmbbxIsolationLevel.getSelectedItem().toString();
+//            controller.sendTransactionFromGUI(targetNode, query, type, isolationLevel);
+            controller.sendTransactions();
         }
         else if(ae.getSource() == btnPalawan)
         {
@@ -234,7 +248,8 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
             String query = getInputQuery();
             String type = getInputQueryType();
             String isolationLevel = cmbbxIsolationLevel.getSelectedItem().toString();
-            String sTrans = controller.addTransactionFromGUI(targetNode, query, type, isolationLevel);
+            int timeDelay = getTimeDelay();
+            String sTrans = controller.addTransactionFromGUI(targetNode, query, type, isolationLevel, timeDelay);
             listModel.addElement(sTrans);
         }
         
@@ -242,7 +257,8 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
         {
             int i = list.getSelectedIndex();
             System.out.println(i);
-            list.remove(i);
+            listModel.remove(i);
+            controller.deleteTransactionFromGUI(i);
         }
     }
 
@@ -252,6 +268,14 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 //		controller.refreshQuery();
 //		setQueryTextArea(controller.getFinalQuery());
 //	}
+    
+    public int getTimeDelay() {
+    	return Integer.parseInt(txtfldTimeDelay.getText());
+    }
+
+    public void setTxtfldTimeDelay(String s) {
+        this.txtfldTimeDelay.setText(s);
+    }
 
     public String getInputQueryNode() {
         String input = cmbbxQueryNode.getSelectedItem().toString();

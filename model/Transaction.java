@@ -28,6 +28,8 @@ public class Transaction implements Serializable {
     private int targetNodeId;
 	private CachedRowSet crs;
 
+    private int timeDelay;
+
     public Transaction(int transactionType, CachedRowSet crs, int sourceNodeId, int affectedNodeId) {
         this.transactionType = transactionType;
         this.crs = crs;
@@ -40,6 +42,20 @@ public class Transaction implements Serializable {
         this.transactionType = transactionType;
         this.sourceNodeId = sourceNodeId;
         this.affectedNodeId = affectedNodeId;
+    }
+
+    public Transaction(int transactionType, int sourceNodeId, int affectedNodeId) {
+        this.transactionType = transactionType;
+        this.sourceNodeId = sourceNodeId;
+        this.affectedNodeId = affectedNodeId;
+    }
+
+    public int getTimeDelay() {
+        return timeDelay;
+    }
+
+    public void setTimeDelay(int timeDelay) {
+        this.timeDelay = timeDelay;
     }
 
     public int getTargetNodeId() {

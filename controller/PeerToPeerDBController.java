@@ -13,6 +13,7 @@ import com.sun.rowset.CachedRowSetImpl;
 import model.AppDatabase;
 import model.Transaction;
 import model.network.ClientRunner;
+import model.network.IncomingTransactionsHandler;
 import model.network.ServerRunner;
 import net.proteanit.sql.DbUtils;
 import utilities.dbconnection.MySQLConnector;
@@ -25,13 +26,13 @@ public class PeerToPeerDBController {
 //    private BroadcastRunner broadcastRunner;
 
     /** Model stuff */
-    private int nodeId;
+    public int nodeId;
     private ArrayList<Transaction> transactions;
     
     /** SQL stuff */
     private MySQLConnector connector;
     
-    private PeerToPeerDBView view;
+    public PeerToPeerDBView view;
     
 	public PeerToPeerDBController(PeerToPeerDBView view, int nodeId) {
 		this.view = view;
@@ -99,43 +100,10 @@ public class PeerToPeerDBController {
 
         }
 
+        IncomingTransactionsHandler transactionsHandler = new IncomingTransactionsHandler(transaction, this, connector);
+        Thread transactionsHandlerThread = new Thread(transactionsHandler);
+        transactionsHandlerThread.start();
 
-        /** AYAN BASTA EXECUTE KASI WALANG LINALABAS PERO SUBMIT MERON OH YEAH */
-        switch (transaction.getTransactionType()) {
-            case Transaction.REQUEST_WRITE :
-                executeCustomStatement(transaction.getQueryStatement());
-                break;
-            case Transaction.REQUEST_READ_UNCOMMITTED :
-                /** Set Isolation Level */
-                connector.updateIsolationLevel("READ UNCOMMITTED");
-                /** prepare result set to be returned */
-                ResultSet resultSet = queryAndReturnResultSet(transaction.getQueryStatement());
-                CachedRowSet cachedRowSet = null;
-                try {
-                    cachedRowSet = new CachedRowSetImpl();
-                    cachedRowSet.populate(resultSet);
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-
-                /** check if success */
-                int responseTransactionType;
-                responseTransactionType = Transaction.RESPONSE_READ_SUCCESS;
-                Transaction transactionResponse = new Transaction(Transaction.RESPONSE_READ_SUCCESS, cachedRowSet, nodeId, transaction.getAffectedNodeId());
-
-                /** send response */
-                sendTransactionToNode(transactionResponse, transaction.getSourceNodeId());
-                break;
-            case Transaction.RESPONSE_READ_SUCCESS :
-//                queryAndShowResult(transaction.getQueryStatement());
-                appendToLog("Successfully read from " + getNodeNameFromId(transaction.getSourceNodeId()));
-                try {
-                    view.setResultTableModel(DbUtils.resultSetToTableModel(transaction.getCrs().getOriginal()));
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                }
-                break;
-        }
     }
 
     public void sendTransactionFromGUI(String targetNode, String query, String queryType, String isolationLevel) {
@@ -207,7 +175,7 @@ public class PeerToPeerDBController {
 
     }
 
-    public void sendMultipleTransactions(ArrayList<Transaction> transactions) {
+    public void sendTransactions() {
         for(Transaction transaction : transactions) {
             int targetNodeId = chooseTargetNodeId(this.nodeId, transaction.getAffectedNodeId());
             sendTransactionToNode(transaction, targetNodeId);
@@ -232,7 +200,23 @@ public class PeerToPeerDBController {
         if( transaction.getTransactionType() == Transaction.REQUEST_WRITE ) {
             appendToLog("Unable to perform write operation, Central Node is down" );
         }
+        /** if read operation */
         else if( transaction.getTransactionType() == Transaction.REQUEST_READ_UNCOMMITTED ) {
+            appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
+            transaction.setTargetNodeId(transaction.getAffectedNodeId());
+            sendTransactionToNode(transaction, transaction.getTargetNodeId());
+        }
+        else if( transaction.getTransactionType() == Transaction.REQUEST_READ_COMMITTED ) {
+            appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
+            transaction.setTargetNodeId(transaction.getAffectedNodeId());
+            sendTransactionToNode(transaction, transaction.getTargetNodeId());
+        }
+        else if( transaction.getTransactionType() == Transaction.REQUEST_READ_REPEATABLE ) {
+            appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
+            transaction.setTargetNodeId(transaction.getAffectedNodeId());
+            sendTransactionToNode(transaction, transaction.getTargetNodeId());
+        }
+        else if( transaction.getTransactionType() == Transaction.REQUEST_READ_SERIALIZEABLE ) {
             appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
             transaction.setTargetNodeId(transaction.getAffectedNodeId());
             sendTransactionToNode(transaction, transaction.getTargetNodeId());
@@ -247,7 +231,7 @@ public class PeerToPeerDBController {
 
     public void initializeUI() {
         view.setQueryTextArea(getQueryStatement(view.getInputQueryType(), view.getInputQueryNode()));
-
+        view.setTxtfldTimeDelay("0");
     }
 
     private String getIpAddressFromId(int id) {
@@ -268,7 +252,7 @@ public class PeerToPeerDBController {
         return -1;
     }
 
-    private String getNodeNameFromId(int id) {
+    public String getNodeNameFromId(int id) {
         switch (id){
             case AppDatabase.CENTRAL_NODE_ID: return "Central";
             case AppDatabase.PALAWAN_NODE_ID: return "Palawan";
@@ -310,14 +294,14 @@ public class PeerToPeerDBController {
         return queryStatement;
     }
     
-    public String addTransactionFromGUI(String targetNode, String query, String queryType, String isolationLevel)
+    public String addTransactionFromGUI(String targetNode, String query, String queryType, String isolationLevel, int timeDelay)
     {
     	int targetNodeId = 0;
         int transactionType = 0;
         int affectedNodeId = 0;
 
         /** Set transaction type */
-        if(queryType.equalsIgnoreCase("Read")) {
+        if(queryType.contains("Read")) {
 
             if(isolationLevel.equalsIgnoreCase("Read uncommitted")) {
                 transactionType = Transaction.REQUEST_READ_UNCOMMITTED;;
@@ -332,7 +316,7 @@ public class PeerToPeerDBController {
                 transactionType = Transaction.REQUEST_READ_SERIALIZEABLE;
             }
 
-        } else if(queryType.equalsIgnoreCase("Write")) {
+        } else if(queryType.contains("Write")) {
             transactionType = Transaction.REQUEST_WRITE;
         }
 
@@ -350,8 +334,9 @@ public class PeerToPeerDBController {
 
         /** Prepare transaction */
         Transaction transaction = new Transaction(query, transactionType, this.nodeId, affectedNodeId );
+        transaction.setTimeDelay(timeDelay);
         transactions.add(transaction);
-		return  targetNode +" - " +  query +" - "+ queryType + " - "+  isolationLevel;
+		return  targetNode +" - " +  query +" - "+ queryType + " - "+  isolationLevel + " - " + transaction.getTimeDelay() + "secs";
 
     }
     

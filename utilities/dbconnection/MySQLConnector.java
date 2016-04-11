@@ -31,6 +31,16 @@ public class MySQLConnector {
 	}
 	return conn; 
     }
+
+    public static void executeUpdate( String query ) {
+        Statement stmt = null;
+        try {
+            stmt = MySQLConnector.getConnection().createStatement();
+            stmt.executeUpdate(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 	
     public static void executeStatement(String statement){
         Connection conn = getConnection();
@@ -43,6 +53,32 @@ public class MySQLConnector {
             e.printStackTrace();
             System.out.println("DB error");
 	}
+    }
+
+    public static void lockTable() {
+
+        String prequery = "LOCK TABLE hpq_hh WRITE;";
+        PreparedStatement lockStatement;
+        try {
+            lockStatement = MySQLConnector.getConnection().prepareStatement(prequery);
+            lockStatement.setQueryTimeout(20);
+            lockStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void unlockTable() {
+
+        String prequery = "UNLOCK TABLES;";
+        PreparedStatement unlockStatement;
+        try {
+            unlockStatement = MySQLConnector.getConnection().prepareStatement(prequery);
+            unlockStatement.setQueryTimeout(20);
+            unlockStatement.execute();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
     
     public static ResultSet executeQuery(String query)
@@ -81,6 +117,29 @@ public class MySQLConnector {
         catch(Exception e){
             e.printStackTrace();
         }
+    }
+
+    public boolean isTableLocked() {
+
+        String query = "SHOW OPEN TABLES WHERE `Table` LIKE 'hpq_hh' AND In_use > 0;";
+
+        try {
+            PreparedStatement statement;
+            statement = MySQLConnector.getConnection().prepareStatement(query);
+            statement.setQueryTimeout(20);
+
+            ResultSet tablecheck = statement.executeQuery();
+
+            tablecheck.next();
+            System.out.println("abot dito sirs");
+            if(tablecheck.getString("In_use").equalsIgnoreCase("1"))
+                return true;
+            else return false;
+
+        } catch (SQLException ex) {
+            System.out.println("check table error");
+        }
+        return false;
     }
     
     public long getExeTime()
