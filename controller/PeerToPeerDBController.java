@@ -3,9 +3,13 @@ package controller;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
+import javax.sql.rowset.CachedRowSet;
 import javax.swing.table.TableModel;
 
+import com.sun.rowset.CachedRowSetImpl;
 import model.AppDatabase;
 import model.Transaction;
 import model.network.ClientRunner;
@@ -22,6 +26,7 @@ public class PeerToPeerDBController {
 
     /** Model stuff */
     private int nodeId;
+    private ArrayList<Transaction> transactions;
     
     /** SQL stuff */
     private MySQLConnector connector;
@@ -31,6 +36,7 @@ public class PeerToPeerDBController {
 	public PeerToPeerDBController(PeerToPeerDBView view, int nodeId) {
 		this.view = view;
         this.nodeId = nodeId;
+        this.transactions = new ArrayList<>();
 
 		/** DB stuff */
         String dbSchema = getSchemaNameFromId(nodeId);
@@ -99,12 +105,18 @@ public class PeerToPeerDBController {
                 connector.updateIsolationLevel("READ UNCOMMITTED");
                 /** prepare result set to be returned */
                 ResultSet resultSet = queryAndReturnResultSet(transaction.getQueryStatement());
-                TableModel resultModel = DbUtils.resultSetToTableModel(resultSet);
+                CachedRowSet cachedRowSet = null;
+                try {
+                    cachedRowSet = new CachedRowSetImpl();
+                    cachedRowSet.populate(resultSet);
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
 
                 /** check if success */
                 int responseTransactionType;
                 responseTransactionType = Transaction.RESPONSE_READ_SUCCESS;
-                Transaction transactionResponse = new Transaction(Transaction.RESPONSE_READ_SUCCESS, resultModel, nodeId, transaction.getAffectedNodeId());
+                Transaction transactionResponse = new Transaction(Transaction.RESPONSE_READ_SUCCESS, cachedRowSet, nodeId, transaction.getAffectedNodeId());
 
                 /** send response */
                 sendTransactionToNode(transactionResponse, transaction.getSourceNodeId());
@@ -112,7 +124,11 @@ public class PeerToPeerDBController {
             case Transaction.RESPONSE_READ_SUCCESS :
 //                queryAndShowResult(transaction.getQueryStatement());
                 appendToLog("Successfully read from " + getNodeNameFromId(transaction.getSourceNodeId()));
-                view.setResultTableModel(transaction.getResultModel());
+                try {
+                    view.setResultTableModel(DbUtils.resultSetToTableModel(transaction.getCrs().getOriginal()));
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
                 break;
         }
     }

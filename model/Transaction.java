@@ -1,6 +1,6 @@
 package model;
 
-import javax.swing.table.TableModel;
+import javax.sql.rowset.CachedRowSet;
 import java.io.Serializable;
 
 public class Transaction implements Serializable {
@@ -25,11 +25,11 @@ public class Transaction implements Serializable {
 	private int transactionType;
     private int sourceNodeId;
     private int affectedNodeId;
-	private TableModel resultModel;
+	private CachedRowSet crs;
 
-    public Transaction(int transactionType, TableModel resultModel, int sourceNodeId, int affectedNodeId) {
+    public Transaction(int transactionType, CachedRowSet crs, int sourceNodeId, int affectedNodeId) {
         this.transactionType = transactionType;
-        this.resultModel = resultModel;
+        this.crs = crs;
         this.sourceNodeId = sourceNodeId;
     }
 
@@ -55,12 +55,12 @@ public class Transaction implements Serializable {
         this.sourceNodeId = sourceNodeId;
     }
 
-    public TableModel getResultModel() {
-        return resultModel;
+    public CachedRowSet getCrs() {
+        return crs;
     }
 
-    public void setResultModel(TableModel resultModel) {
-        this.resultModel = resultModel;
+    public void setCrs(CachedRowSet crs) {
+        this.crs = crs;
     }
 
     public String getQueryStatement() {
