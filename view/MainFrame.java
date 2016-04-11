@@ -25,7 +25,7 @@ public class MainFrame extends JFrame {
 		this.setTitle(appName);
 		this.setResizable(false);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setBounds(10, 72, 802, 520);
+		this.setBounds(10, 72, 902, 620);
 		
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);

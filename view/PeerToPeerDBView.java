@@ -25,25 +25,26 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
     private JComboBox cmbbxIsolationLevel;
     private JComboBox cmbbxQueryType;
     private JLabel lblQueryDetails;
-    private JLabel lblTime;
-    private JTextPane txtpnTime;
     private JButton btnSend;
     private JTextArea txtarLog;
     private JScrollBar sb;
     private JButton btnPalawan;
     private JButton btnMarinduque;
     private JButton btnCentral;
-
-
+    private JScrollPane scrollPane_1;
+    private DefaultListModel listModel = new DefaultListModel();
     /** Controller */
     private PeerToPeerDBController controller;
     private JTextArea txtarQuery;
     private JTable resultTable;
     private JScrollPane scrollPane_2;
+    private JButton btnAdd;
+    private JList list;
+    private JButton btnDelete;
 
     public PeerToPeerDBView(MainFrame mainFrame, int nodeType) {
         this.setLayout(null);
-        this.setBounds(10, 72, 802, 480);
+        this.setBounds(10, 72, 802, 583);
         controller = new PeerToPeerDBController(this, nodeType);
 
         /** Initial model for table */
@@ -59,7 +60,7 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 
         jscrllpnlTable=new JScrollPane(resultTable, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         // jscrllpnlTable.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-        jscrllpnlTable.setBounds(177, 265, 615, 204);
+        jscrllpnlTable.setBounds(177, 183, 615, 147);
         jscrllpnlTable.setVisible(true);
         add(jscrllpnlTable);
 
@@ -99,19 +100,8 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
         lblQueryDetails.setBounds(177, 8, 157, 24);
         add(lblQueryDetails);
 
-        lblTime = new JLabel("Time");
-        lblTime.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        lblTime.setBounds(10, 395, 157, 20);
-        add(lblTime);
-
-        txtpnTime = new JTextPane();
-        txtpnTime.setText("0ms");
-        txtpnTime.setFont(new Font("Tahoma", Font.PLAIN, 30));
-        txtpnTime.setBounds(10, 426, 157, 43);
-        add(txtpnTime);
-
         btnSend = new JButton("Send");
-        btnSend.setBounds(30, 210, 109, 31);
+        btnSend.setBounds(30, 426, 109, 31);
         btnSend.addActionListener(this);
         add(btnSend);
 
@@ -127,12 +117,12 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
 
         JLabel lblQuery_1 = new JLabel("Query");
         lblQuery_1.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        lblQuery_1.setBounds(177, 163, 157, 24);
+        lblQuery_1.setBounds(177, 466, 157, 24);
         add(lblQuery_1);
 
         JLabel lblTable = new JLabel("Table");
         lblTable.setFont(new Font("Tahoma", Font.PLAIN, 11));
-        lblTable.setBounds(177, 242, 157, 24);
+        lblTable.setBounds(177, 161, 157, 24);
         add(lblTable);
 
         JLabel lblType = new JLabel("Type");
@@ -152,7 +142,7 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
         txtarLog.setToolTipText("Enter query here");
 
         scrollPane_2 = new JScrollPane();
-        scrollPane_2.setBounds(177, 184, 615, 57);
+        scrollPane_2.setBounds(177, 494, 615, 57);
         add(scrollPane_2);
 
         txtarQuery = new JTextArea();
@@ -160,19 +150,47 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
         txtarQuery.setToolTipText("Enter query here");
 
         btnPalawan = new JButton("Palawan");
-        btnPalawan.setBounds(30, 348, 89, 23);
+        btnPalawan.setBounds(30, 262, 109, 23);
         btnPalawan.addActionListener(this);
         add(btnPalawan);
 
         btnMarinduque = new JButton("Marinduque");
-        btnMarinduque.setBounds(30, 324, 89, 23);
+        btnMarinduque.setBounds(30, 238, 109, 23);
         btnMarinduque.addActionListener(this);
         add(btnMarinduque);
 
         btnCentral = new JButton("Central");
         btnCentral.addActionListener(this);
-        btnCentral.setBounds(30, 300, 89, 23);
+        btnCentral.setBounds(30, 214, 109, 23);
         add(btnCentral);
+        
+        JLabel lblCheckStatus = new JLabel("Check Status");
+        lblCheckStatus.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        lblCheckStatus.setBounds(10, 179, 157, 24);
+        add(lblCheckStatus);
+        
+        JLabel lblTransactions = new JLabel("Transactions");
+        lblTransactions.setFont(new Font("Tahoma", Font.PLAIN, 11));
+        lblTransactions.setBounds(177, 330, 157, 24);
+        add(lblTransactions);
+        
+        scrollPane_1 = new JScrollPane();
+        scrollPane_1.setBounds(177, 355, 615, 113);
+        add(scrollPane_1);
+        
+        list = new JList(listModel);
+        scrollPane_1.setColumnHeaderView(list);
+
+        
+        btnDelete = new JButton("Delete");
+        btnDelete.setBounds(30, 390, 109, 31);
+        btnDelete.addActionListener(this);
+        add(btnDelete);
+        
+        btnAdd = new JButton("Add");
+        btnAdd.setBounds(30, 520, 109, 31);
+        btnAdd.addActionListener(this);
+        add(btnAdd);
 
         controller.initializeUI();
     }
@@ -209,6 +227,22 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
         else if(ae.getSource() == btnCentral)
         {
             checkCentral();
+        }
+        else if(ae.getSource() == btnAdd)
+        {
+            String targetNode = getInputQueryNode();
+            String query = getInputQuery();
+            String type = getInputQueryType();
+            String isolationLevel = cmbbxIsolationLevel.getSelectedItem().toString();
+            String sTrans = controller.addTransactionFromGUI(targetNode, query, type, isolationLevel);
+            listModel.addElement(sTrans);
+        }
+        
+        else if(ae.getSource() == btnDelete)
+        {
+            int i = list.getSelectedIndex();
+            System.out.println(i);
+            list.remove(i);
         }
     }
 
@@ -277,9 +311,9 @@ public class PeerToPeerDBView extends JPanel implements ActionListener, KeyListe
         return resultTable;
     }
 
-    public JTextPane getTxtTime(){
+/*    public JTextPane getTxtTime(){
         return txtpnTime;
-    }
+    }*/
 
     @Override
     public void keyPressed(KeyEvent arg0) {

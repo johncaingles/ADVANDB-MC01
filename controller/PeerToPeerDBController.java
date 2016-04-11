@@ -77,7 +77,7 @@ public class PeerToPeerDBController {
 		ResultSet resultSet = connector.executeQuery(query);
 		TableModel model = DbUtils.resultSetToTableModel(resultSet);
 		view.getResultTable().setModel(model);
-		view.getTxtTime().setText(Long.toString(connector.getExeTime())+ " ms");
+		//view.getTxtTime().setText(Long.toString(connector.getExeTime())+ " ms");
 	}
 
     public ResultSet queryAndReturnResultSet(String query){
@@ -87,7 +87,7 @@ public class PeerToPeerDBController {
 
 	public void executeCustomStatement(String query) {
 		connector.executeStatement(query);
-		view.getTxtTime().setText(Long.toString(connector.getExeTime())+ " ms");
+		//view.getTxtTime().setText(Long.toString(connector.getExeTime())+ " ms");
 	}
 
     public void receiveTransaction(Transaction transaction) {
@@ -280,4 +280,55 @@ public class PeerToPeerDBController {
 
         return queryStatement;
     }
+    
+    public String addTransactionFromGUI(String targetNode, String query, String queryType, String isolationLevel)
+    {
+    	int targetNodeId = 0;
+        int transactionType = 0;
+        int affectedNodeId = 0;
+
+        /** Set transaction type */
+        if(queryType.equalsIgnoreCase("Read")) {
+
+            if(isolationLevel.equalsIgnoreCase("Read uncommitted")) {
+                transactionType = Transaction.REQUEST_READ_UNCOMMITTED;;
+            } else
+            if(isolationLevel.equalsIgnoreCase("Read commited")) {
+                transactionType = Transaction.REQUEST_READ_COMMITTED;
+            } else
+            if(isolationLevel.equalsIgnoreCase("Read repeatable")) {
+                transactionType = Transaction.REQUEST_READ_REPEATABLE;
+            } else
+            if(isolationLevel.equalsIgnoreCase("Serializeable")) {
+                transactionType = Transaction.REQUEST_READ_SERIALIZEABLE;
+            }
+
+        } else if(queryType.equalsIgnoreCase("Write")) {
+            transactionType = Transaction.REQUEST_WRITE;
+        }
+
+        System.out.println("i am target: " + targetNode);
+        /** set target node id */
+        if(targetNode.equalsIgnoreCase("Palawan")) {
+            affectedNodeId = AppDatabase.PALAWAN_NODE_ID;
+        }
+        else if(targetNode.equalsIgnoreCase("Marinduque")) {
+            affectedNodeId = AppDatabase.MARINDUQUE_NODE_ID;
+        }
+        else if(targetNode.equalsIgnoreCase("Central")) {
+            affectedNodeId = AppDatabase.CENTRAL_NODE_ID;
+        }
+
+        /** Prepare transaction */
+        Transaction transaction = new Transaction(query, transactionType, this.nodeId, affectedNodeId );
+        transactions.add(transaction);
+		return  targetNode +" - " +  query +" - "+ queryType + " - "+  isolationLevel;
+
+    }
+    
+    public void deleteTransactionFromGUI(int i)
+    {
+    	transactions.remove(i);
+    }
+
 }
