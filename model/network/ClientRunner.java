@@ -5,16 +5,20 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+import controller.PeerToPeerDBController;
 import model.AppDatabase;
 import model.Transaction;
 
 public class ClientRunner implements Runnable {
 
+    private PeerToPeerDBController controller;
+
     private Transaction transaction;
     private String ipAddress;
     private int portNumber;
 
-    public ClientRunner(Transaction transaction, String ipAddress, int portNumber) {
+    public ClientRunner(PeerToPeerDBController controller, Transaction transaction, String ipAddress, int portNumber) {
+        this.controller = controller;
         this.transaction = transaction;
         this.ipAddress = ipAddress;
         this.portNumber = portNumber;
@@ -33,7 +37,7 @@ public class ClientRunner implements Runnable {
             outToClient = new ObjectOutputStream(clientSocket.getOutputStream());
             outToClient.writeObject(transaction);
         } catch (IOException e) {
-            e.printStackTrace();
+            controller.failedToSendTransaction( transaction,  ipAddress,  portNumber);
         }
 
 

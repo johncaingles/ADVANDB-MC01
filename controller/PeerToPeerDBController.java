@@ -95,6 +95,11 @@ public class PeerToPeerDBController {
         System.out.println("recevied Query" + transaction.getQueryStatement());
         System.out.println("recevied Type" + transaction.getTransactionType());
 
+        if( this.nodeId == AppDatabase.CENTRAL_NODE_ID ) {
+
+        }
+
+
         /** AYAN BASTA EXECUTE KASI WALANG LINALABAS PERO SUBMIT MERON OH YEAH */
         switch (transaction.getTransactionType()) {
             case Transaction.REQUEST_WRITE :
@@ -176,7 +181,7 @@ public class PeerToPeerDBController {
 
         /** choose target for realzszzsz */
         targetNodeId = chooseTargetNodeId(this.nodeId, affectedNodeId);
-        System.out.println("targetNodeId: " + targetNodeId);
+        transaction.setTargetNodeId(targetNodeId);
         sendTransactionToNode(transaction, targetNodeId);
     }
 
@@ -188,13 +193,25 @@ public class PeerToPeerDBController {
         if(affectedNodeId == this.nodeId)
             return targetNodeId = affectedNodeId;
 
-        switch( AppDatabase.CENTRAL_AVAILABILITY ) {
-            case 1 : targetNodeId = AppDatabase.CENTRAL_NODE_ID; break;
-            case -1 : targetNodeId = affectedNodeId; break;
+//        switch( AppDatabase.CENTRAL_AVAILABILITY ) {
+//            case 1 : targetNodeId = AppDatabase.CENTRAL_NODE_ID; break;
+//            case -1 : targetNodeId = affectedNodeId; break;
+//        }
+
+        if( this.nodeId == AppDatabase.CENTRAL_NODE_ID ) {
+            targetNodeId = affectedNodeId;
         }
+        else targetNodeId = AppDatabase.CENTRAL_NODE_ID;
 
         return targetNodeId;
 
+    }
+
+    public void sendMultipleTransactions(ArrayList<Transaction> transactions) {
+        for(Transaction transaction : transactions) {
+            int targetNodeId = chooseTargetNodeId(this.nodeId, transaction.getAffectedNodeId());
+            sendTransactionToNode(transaction, targetNodeId);
+        }
     }
 
     public void sendTransactionToNode( Transaction transaction, int targetNodeId) {
@@ -205,10 +222,22 @@ public class PeerToPeerDBController {
         /** send transaction */
         appendToLog("Sending transaction to " + getNodeNameFromId(targetNodeId));
         /** start client as thread */
-        ClientRunner clientRunner = new ClientRunner(transaction, targetIpAddress, targetPortNum);
+        ClientRunner clientRunner = new ClientRunner(this, transaction, targetIpAddress, targetPortNum);
         Thread clientThread = new Thread(clientRunner);
         clientThread.start();
 	}
+
+    public void failedToSendTransaction(Transaction transaction, String ipAddress, int portNumber) {
+        /** if write operation */
+        if( transaction.getTransactionType() == Transaction.REQUEST_WRITE ) {
+            appendToLog("Unable to perform write operation, Central Node is down" );
+        }
+        else if( transaction.getTransactionType() == Transaction.REQUEST_READ_UNCOMMITTED ) {
+            appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
+            transaction.setTargetNodeId(transaction.getAffectedNodeId());
+            sendTransactionToNode(transaction, transaction.getTargetNodeId());
+        }
+    }
 
     public void appendToLog(String log) {
         String logs = view.getLogText() + log + "\n" ;

@@ -25,18 +25,29 @@ public class Transaction implements Serializable {
 	private int transactionType;
     private int sourceNodeId;
     private int affectedNodeId;
+    private int targetNodeId;
 	private CachedRowSet crs;
 
     public Transaction(int transactionType, CachedRowSet crs, int sourceNodeId, int affectedNodeId) {
         this.transactionType = transactionType;
         this.crs = crs;
         this.sourceNodeId = sourceNodeId;
+        this.affectedNodeId = affectedNodeId;
     }
 
     public Transaction(String queryStatement, int transactionType, int sourceNodeId, int affectedNodeId) {
         this.queryStatement = queryStatement;
         this.transactionType = transactionType;
         this.sourceNodeId = sourceNodeId;
+        this.affectedNodeId = affectedNodeId;
+    }
+
+    public int getTargetNodeId() {
+        return targetNodeId;
+    }
+
+    public void setTargetNodeId(int targetNodeId) {
+        this.targetNodeId = targetNodeId;
     }
 
     public int getAffectedNodeId() {

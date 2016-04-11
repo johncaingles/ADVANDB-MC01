@@ -24,7 +24,7 @@ public class AppDatabase {
 
 	/** 1 means available */
     /** -1 is down */
-	public static int CENTRAL_AVAILABILITY = -1;
+	public static int CENTRAL_AVAILABILITY = 1;
 	public static int MARINDUQUE_AVAILABILITY = 1;
 	public static int PALAWAN_AVAILABILITY = 1;
 
