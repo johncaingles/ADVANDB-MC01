@@ -3,6 +3,7 @@ package model.network;
 import com.mysql.jdbc.MySQLConnection;
 import com.sun.rowset.CachedRowSetImpl;
 import controller.PeerToPeerDBController;
+import model.AppDatabase;
 import model.Transaction;
 import net.proteanit.sql.DbUtils;
 import utilities.dbconnection.MySQLConnector;
@@ -34,6 +35,46 @@ public class IncomingTransactionsHandler implements Runnable{
         Transaction transactionResponse = null;
 
         /** AYAN BASTA EXECUTE KASI WALANG LINALABAS PERO SUBMIT MERON OH YEAH */
+        /** write request sa central, to other node */
+        if(transaction.getTransactionType() == Transaction.REQUEST_WRITE) {
+        if (transaction.getAffectedNodeId() != AppDatabase.CENTRAL_NODE_ID && controller.nodeId == AppDatabase.CENTRAL_NODE_ID) {
+            if (transaction.getTransactionType() == Transaction.REQUEST_WRITE) {
+
+                controller.sendTransactionToNode(transaction, transaction.getAffectedNodeId());
+            }
+        } else if (transaction.getTargetNodeId() != controller.nodeId && transaction.getAffectedNodeId() == controller.nodeId) {
+            // means relay, fromo other node, then from central
+            if (!connector.isTableLocked()) {
+
+                connector.executeUpdate(transaction.getQueryStatement());
+                connector.lockTable();
+                try {
+                    Thread.sleep(transaction.getTimeDelay() * 1000);                 //1000 milliseconds is one second.
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
+                connector.unlockTable();
+                responseTransactionType = Transaction.RESPONSE_WRITE_SUCCESS;
+                controller.appendToLog("Write success!");
+            } else {
+                responseTransactionType = Transaction.RESPONSE_WRITE_FAIL;
+                controller.appendToLog("Write failed.");
+            }
+
+            transactionResponse = new Transaction(responseTransactionType, AppDatabase.CENTRAL_NODE_ID, transaction.getAffectedNodeId());
+            /** send response */
+            controller.sendTransactionToNode(transactionResponse, transaction.getSourceNodeId());
+
+        } else if (transaction.getSourceNodeId() == controller.nodeId && transaction.getTransactionType() == Transaction.RESPONSE_WRITE_SUCCESS) {
+            // central will now pass to original asker
+            //relay
+            if (transaction.getAffectedNodeId() == AppDatabase.PALAWAN_NODE_ID)
+                controller.sendTransactionToNode(transaction, AppDatabase.MARINDUQUE_NODE_ID);
+            else if (transaction.getAffectedNodeId() == AppDatabase.MARINDUQUE_NODE_ID)
+                controller.sendTransactionToNode(transaction, AppDatabase.PALAWAN_NODE_ID);
+        }
+    }
+        else
         switch (transaction.getTransactionType()) {
             case Transaction.REQUEST_WRITE :
                 if( !connector.isTableLocked() ) {
@@ -47,9 +88,11 @@ public class IncomingTransactionsHandler implements Runnable{
                     }
                     connector.unlockTable();
                     responseTransactionType = Transaction.RESPONSE_WRITE_SUCCESS;
+                    controller.appendToLog("Write success!");
                 }
                 else {
                     responseTransactionType = Transaction.RESPONSE_WRITE_FAIL;
+                    controller.appendToLog("Write fail.");
                 }
 
                 transactionResponse = new Transaction(responseTransactionType, controller.nodeId, transaction.getAffectedNodeId());

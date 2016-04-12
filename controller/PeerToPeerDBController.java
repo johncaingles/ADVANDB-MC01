@@ -148,36 +148,42 @@ public class PeerToPeerDBController {
         Transaction transaction = new Transaction(query, transactionType, this.nodeId, affectedNodeId );
 
         /** choose target for realzszzsz */
-        targetNodeId = chooseTargetNodeId(this.nodeId, affectedNodeId);
+        targetNodeId = chooseTargetNodeId(this.nodeId, transaction);
         transaction.setTargetNodeId(targetNodeId);
         sendTransactionToNode(transaction, targetNodeId);
     }
 
-    private int chooseTargetNodeId(int nodeId, int affectedNodeId) {
+    private int chooseTargetNodeId(int nodeId, Transaction transaction) {
 
         int targetNodeId = -1;
 
+        if(transaction.getTransactionType() == Transaction.REQUEST_WRITE){
+
+            return targetNodeId = AppDatabase.CENTRAL_NODE_ID;
+        }
+
         /** check if reading local */
-        if(affectedNodeId == this.nodeId)
-            return targetNodeId = affectedNodeId;
+        if(transaction.getAffectedNodeId() == this.nodeId)
+            return targetNodeId = nodeId;
+        else if(nodeId == AppDatabase.CENTRAL_NODE_ID)
+            return targetNodeId = nodeId;
+        else return AppDatabase.CENTRAL_NODE_ID;
 
 //        switch( AppDatabase.CENTRAL_AVAILABILITY ) {
 //            case 1 : targetNodeId = AppDatabase.CENTRAL_NODE_ID; break;
 //            case -1 : targetNodeId = affectedNodeId; break;
 //        }
 
-        if( this.nodeId == AppDatabase.CENTRAL_NODE_ID ) {
-            targetNodeId = affectedNodeId;
-        }
-        else targetNodeId = AppDatabase.CENTRAL_NODE_ID;
-
-        return targetNodeId;
+//        if( this.nodeId == AppDatabase.CENTRAL_NODE_ID ) {
+//            targetNodeId = affectedNodeId;
+//        }
+//        else targetNodeId = AppDatabase.CENTRAL_NODE_ID;
 
     }
 
     public void sendTransactions() {
         for(Transaction transaction : transactions) {
-            int targetNodeId = chooseTargetNodeId(this.nodeId, transaction.getAffectedNodeId());
+            int targetNodeId = chooseTargetNodeId(this.nodeId, transaction);
             sendTransactionToNode(transaction, targetNodeId);
         }
     }
@@ -198,28 +204,54 @@ public class PeerToPeerDBController {
     public void failedToSendTransaction(Transaction transaction, String ipAddress, int portNumber) {
         /** if write operation */
         if( transaction.getTransactionType() == Transaction.REQUEST_WRITE ) {
-            appendToLog("Unable to perform write operation, Central Node is down" );
+            appendToLog("Unable to perform write operation, " + getNodeNameFromId(transaction.getAffectedNodeId())   + " is down" );
+            if( this.nodeId == AppDatabase.CENTRAL_NODE_ID && transaction.getTargetNodeId() == this.nodeId ) {
+                // relay back to original requester
+                transaction.setTransactionType(Transaction.RESPONSE_WRITE_FAIL);
+                transaction.setTargetNodeId(transaction.getSourceNodeId());
+                transaction.setSourceNodeId(nodeId);
+                sendTransactionToNode(transaction, transaction.getSourceNodeId());
+            }
         }
         /** if read operation */
         else if( transaction.getTransactionType() == Transaction.REQUEST_READ_UNCOMMITTED ) {
-            appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
-            transaction.setTargetNodeId(transaction.getAffectedNodeId());
-            sendTransactionToNode(transaction, transaction.getTargetNodeId());
+
+            if(nodeId!= AppDatabase.CENTRAL_NODE_ID && transaction.getTargetNodeId() == AppDatabase.CENTRAL_NODE_ID && transaction.getSourceNodeId() == AppDatabase.CENTRAL_NODE_ID) {
+                appendToLog(getNodeNameFromId(transaction.getAffectedNodeId()) + " server is down");
+                appendToLog("Unable to perform read operation on " + getNodeNameFromId(transaction.getTargetNodeId()));
+            } else
+            if(nodeId!= AppDatabase.CENTRAL_NODE_ID ) {
+                appendToLog("Central server is down");
+                appendToLog("Unable to perform read operation on Central, will read directly from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
+                transaction.setSourceNodeId(AppDatabase.CENTRAL_NODE_ID);
+                sendTransactionToNode(transaction, transaction.getAffectedNodeId());
+            }
+            else
+            if(nodeId == AppDatabase.CENTRAL_NODE_ID) {
+                appendToLog(getNodeNameFromId(transaction.getTargetNodeId()) + " server is down");
+                appendToLog("Unable to perform read operation on " + getNodeNameFromId(transaction.getTargetNodeId()));
+            }
         }
         else if( transaction.getTransactionType() == Transaction.REQUEST_READ_COMMITTED ) {
-            appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
-            transaction.setTargetNodeId(transaction.getAffectedNodeId());
-            sendTransactionToNode(transaction, transaction.getTargetNodeId());
+            if(nodeId!= AppDatabase.CENTRAL_NODE_ID) {
+                appendToLog("Unable to perform read operation on Central, will read directly from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
+                transaction.setTargetNodeId(transaction.getAffectedNodeId());
+                sendTransactionToNode(transaction, transaction.getTargetNodeId());
+            }
         }
         else if( transaction.getTransactionType() == Transaction.REQUEST_READ_REPEATABLE ) {
-            appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
-            transaction.setTargetNodeId(transaction.getAffectedNodeId());
-            sendTransactionToNode(transaction, transaction.getTargetNodeId());
+            if(nodeId!= AppDatabase.CENTRAL_NODE_ID) {
+                appendToLog("Unable to perform read operation on Central, will read directly from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
+                transaction.setTargetNodeId(transaction.getAffectedNodeId());
+                sendTransactionToNode(transaction, transaction.getTargetNodeId());
+            }
         }
         else if( transaction.getTransactionType() == Transaction.REQUEST_READ_SERIALIZEABLE ) {
-            appendToLog("Unable to perform read operation on server, will read from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
-            transaction.setTargetNodeId(transaction.getAffectedNodeId());
-            sendTransactionToNode(transaction, transaction.getTargetNodeId());
+            if(nodeId!= AppDatabase.CENTRAL_NODE_ID) {
+                appendToLog("Unable to perform read operation on Central, will read directly from " + getNodeNameFromId(transaction.getAffectedNodeId()) + " node instead");
+                transaction.setTargetNodeId(transaction.getAffectedNodeId());
+                sendTransactionToNode(transaction, transaction.getTargetNodeId());
+            }
         }
     }
 
